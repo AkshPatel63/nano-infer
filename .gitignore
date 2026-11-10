@@ -218,3 +218,26 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# --- nano-infer ---
+# Model weights: always downloaded from the Hugging Face Hub, never committed
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.gguf
+weights/
+checkpoints/
+.cache/
+hf_cache/
+
+# Raw benchmark output (commit only small summaries in benchmarks/results/)
+benchmarks/results/raw/
+
+# Profiler traces
+*.nsys-rep
+*.ncu-rep
+*.trace.json
+
+# macOS
+.DS_Store
