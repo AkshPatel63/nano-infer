@@ -1,7 +1,7 @@
 """GPT-2, written from scratch."""
 
 from dataclasses import dataclass
-import tiktoken 
+
 
 @dataclass
 class GPT2Config:
@@ -31,6 +31,3 @@ class GPT2Config:
         """GPT-2 small, the 124M-parameter model."""
         return cls()
 
-enc = tiktoken.get_encoding("gpt2")
-id = enc.encode("Hello world")
-print(id)
