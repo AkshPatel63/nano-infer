@@ -1,10 +1,10 @@
 """GPT-2, written from scratch."""
 
 from dataclasses import dataclass
-
+import tiktoken 
 
 @dataclass
-class GPTConfig:
+class GPT2Config:
     """Hyperparameters of a GPT-2 model."""
 
     vocab_size: int = 50257
@@ -27,6 +27,10 @@ class GPTConfig:
         return self.emb_dim // self.n_heads
 
     @classmethod
-    def gpt2_small(cls) -> "GPTConfig":
+    def gpt2_small(cls) -> "GPT2Config":
         """GPT-2 small, the 124M-parameter model."""
         return cls()
+
+enc = tiktoken.get_encoding("gpt2")
+id = enc.encode("Hello world")
+print(id)
