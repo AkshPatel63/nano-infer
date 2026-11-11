@@ -50,3 +50,11 @@ class LayerNorm(nn.Module):
         var = x.var(dim=-1, keepdim=True, correction=0)  # divide by N, not N-1
         return (x - mean) / torch.sqrt(var + self.eps) * self.weight + self.bias
 
+
+class GELU(nn.Module):
+    """GELU with the tanh approximation."""
+
+    def forward(self, x):
+        return (
+            0.5 * x * (1 + torch.tanh(math.sqrt(2 / math.pi) * (x + 0.044715 * x**3)))
+        )
