@@ -1,3 +1,8 @@
+import torch
+
+from nanoinfer.models.gpt2 import MLP
+
+
 def test_mlp_output_shape():
     x = torch.randn(2, 5, 768)
     assert MLP(768)(x).shape == (2, 5, 768)
