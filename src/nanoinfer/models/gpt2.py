@@ -58,3 +58,16 @@ class GELU(nn.Module):
         return (
             0.5 * x * (1 + torch.tanh(math.sqrt(2 / math.pi) * (x + 0.044715 * x**3)))
         )
+
+
+class MLP(nn.Module):
+    """Feed Forward network, applied to each token separately"""
+
+    def __init__(self, emb_dim):
+        super().__init__()
+        self.c_fc = nn.Linear(emb_dim, 4 * emb_dim)  # expand 768 -> 3072
+        self.gelu = GELU()
+        self.c_proj = nn.Linear(4 * emb_dim, emb_dim)  # project back: 3072 -> 768
+
+    def forward(self, x):
+        return self.c_proj(self.gelu(self.c_fc(x)))
