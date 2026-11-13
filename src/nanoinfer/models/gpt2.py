@@ -71,3 +71,47 @@ class MLP(nn.Module):
 
     def forward(self, x):
         return self.c_proj(self.gelu(self.c_fc(x)))
+
+
+class CausalSelfAttention(nn.Module):
+    """Multi-head causal Self-attention"""
+
+    def __init__(self, cfg):
+        super().__init__()
+        self.n_heads = cfg.n_heads
+        self.head_dim = cfg.head_dim
+        self.emb_dim = cfg.emb_dim
+        self.c_attn = nn.Linear(
+            cfg.emb_dim, 3 * cfg.emb_dim, bias=cfg.qkv_bias
+        )  # q, k, v together
+        self.c_proj = nn.Linear(cfg.emb_dim, cfg.emb_dim)
+        mask = torch.triu(
+            torch.ones(cfg.context_length, cfg.context_length, dtype=torch.bool),
+            diagonal=1,
+        )
+        self.register_buffer(
+            "mask", mask, persistent=False
+        )  # Ture = Futrue position, hide it
+
+    def forward(self, x):  # (B, T, 768)
+        B, T, C = x.shape
+
+        q, k, v = self.c_attn(x).split(self.emb_dim, dim=-1)  # each (B, T, 768)
+
+        # split 768 into 12 heads of 64, then move heads next to batch
+
+        q = q.view(B, T, self.n_heads, self.head_dim).transpose(1, 2)  # (B, 12, T, 64)
+        k = k.view(B, T, self.n_heads, self.head_dim).transpose(1, 2)
+        v = v.view(B, T, self.n_heads, self.head_dim).transpose(1, 2)
+
+        scores = q @ k.transpose(-2, -1) / math.sqrt(self.head_dim)  # (B, 12, T, T)
+        scores = scores.masked_fill(
+            self.mask[:T, :T], float("-inf")
+        )  # hide the future tokens with -inf
+        weights = torch.softmax(scores, dim=-1)
+
+        out = weights @ v  # (B, 12, T, 64)
+        out = (
+            out.transpose(1, 2).contiguous().view(B, T, C)
+        )  # merge heads : (B, T, 768)
+        return self.c_proj(out)  # (B, T, 768)
