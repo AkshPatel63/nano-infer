@@ -115,3 +115,17 @@ class CausalSelfAttention(nn.Module):
             out.transpose(1, 2).contiguous().view(B, T, C)
         )  # merge heads : (B, T, 768)
         return self.c_proj(out)  # (B, T, 768)
+
+
+class Block(nn.Module):
+    def __init__(self, cfg):
+        super().__init__()
+        self.ln_1 = LayerNorm(cfg.emb_dim, cfg.ln_eps)
+        self.attn = CausalSelfAttention(cfg)
+        self.ln_2 = LayerNorm(cfg.emb_dim, cfg.ln_eps)
+        self.mlp = MLP(cfg.emb_dim)
+
+    def forward(self, x):
+        x = x + self.attn(self.ln_1(x))  # communicate
+        x = x + self.mlp(self.ln_2(x))  # compute
+        return x
