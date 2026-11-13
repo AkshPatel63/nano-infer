@@ -1,7 +1,12 @@
 import torch
 import torch.nn.functional as F
 
-from nanoinfer.models.gpt2 import MLP, CausalSelfAttention, GPT2Config
+from nanoinfer.models.gpt2 import (
+    MLP,
+    Block,
+    CausalSelfAttention,
+    GPT2Config,
+)
 
 
 def test_mlp_output_shape():
@@ -72,3 +77,15 @@ def test_attention_parameter_count():
 def test_attention_mask_not_in_state_dict():
     # The mask is fixed, not learned, so it shouldn't be saved or loaded.
     assert "mask" not in CausalSelfAttention(GPT2Config()).state_dict()
+
+
+def test_block_output_shape():
+    block = Block(GPT2Config())
+    x = torch.randn(2, 5, 768)
+    assert block(x).shape == (2, 5, 768)
+
+
+def test_block_parameter_count():
+    # attention 2,362,368 + MLP 4,722,432 + two LayerNorms 3,072
+    n = sum(p.numel() for p in Block(GPT2Config()).parameters())
+    assert n == 7_087_872
