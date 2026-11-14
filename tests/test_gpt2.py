@@ -1,12 +1,8 @@
+import pytest
 import torch
 import torch.nn.functional as F
 
-from nanoinfer.models.gpt2 import (
-    MLP,
-    Block,
-    CausalSelfAttention,
-    GPT2Config,
-)
+from nanoinfer.models.gpt2 import MLP, Block, CausalSelfAttention, GPT2Config, GPT2Model
 
 
 def test_mlp_output_shape():
@@ -89,3 +85,28 @@ def test_block_parameter_count():
     # attention 2,362,368 + MLP 4,722,432 + two LayerNorms 3,072
     n = sum(p.numel() for p in Block(GPT2Config()).parameters())
     assert n == 7_087_872
+
+
+@pytest.fixture(scope="module")
+def model():
+    return GPT2Model(GPT2Config())
+
+
+def test_model_output_shape(model):
+    idx = torch.randint(0, 50257, (2, 5))
+    assert model(idx).shape == (2, 5, 50257)
+
+
+def test_model_parameter_count(model):
+    # PyTorch counts the tied wte/lm_head table only once.
+    n = sum(p.numel() for p in model.parameters())
+    assert n == 124_439_808
+
+
+def test_weight_tying(model):
+    assert model.lm_head.weight is model.wte.weight
+
+
+def test_rejects_too_long_input(model):
+    with pytest.raises(ValueError):
+        model(torch.zeros(1, 1025, dtype=torch.long))
