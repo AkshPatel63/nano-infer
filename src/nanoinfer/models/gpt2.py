@@ -129,3 +129,30 @@ class Block(nn.Module):
         x = x + self.attn(self.ln_1(x))  # communicate
         x = x + self.mlp(self.ln_2(x))  # compute
         return x
+
+
+class GPT2Model(nn.Module):
+    """GPT-2 model, token ids in, and next tokens scores (logits) out"""
+
+    def __init__(self, cfg):
+        super().__init__()
+        self.cfg = cfg
+        self.wte = nn.Embedding(cfg.vocab_size, cfg.emb_dim)  # token table
+        self.wpe = nn.Embedding(cfg.context_length, cfg.emb_dim)  # position table
+        self.h = nn.ModuleList([Block(cfg) for _ in range(cfg.n_layers)])
+        self.ln_f = LayerNorm(cfg.emb_dim, cfg.ln_eps)
+        self.lm_head = nn.Linear(cfg.emb_dim, cfg.vocab_size, bias=False)
+        self.lm_head.weight = self.wte.weight  # weight tying
+
+    def forward(self, idx):
+        _, T = idx.shape
+        if T > self.cfg.context_length:
+            raise ValueError(
+                f"sequence length {T} exceeds context length {self.cfg.context_length}"
+            )
+        pos = torch.arange(T, device=idx.device)
+        x = self.wte(idx) + self.wpe(pos)
+        for block in self.h:
+            x = block(x)
+        x = self.ln_f(x)
+        return self.lm_head(x)
