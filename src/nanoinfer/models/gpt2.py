@@ -19,19 +19,19 @@ class GPT2Config:
     qkv_bias: bool = True
     ln_eps: float = 1e-5
 
-    def __post_init__(self) -> None:
+    def __post_init__(self):
         if self.emb_dim % self.n_heads != 0:
             raise ValueError(
                 f"emb_dim ({self.emb_dim}) must be divisible by n_heads ({self.n_heads})"
             )
 
     @property
-    def head_dim(self) -> int:
+    def head_dim(self):
         """Size of each attention head (768 / 12 = 64 for GPT-2 small)."""
         return self.emb_dim // self.n_heads
 
     @classmethod
-    def gpt2_small(cls) -> "GPT2Config":
+    def gpt2_small(cls):
         """GPT-2 small, the 124M-parameter model."""
         return cls()
 
