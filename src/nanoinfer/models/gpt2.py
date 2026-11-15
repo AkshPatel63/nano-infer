@@ -91,7 +91,7 @@ class CausalSelfAttention(nn.Module):
         )
         self.register_buffer(
             "mask", mask, persistent=False
-        )  # Ture = Futrue position, hide it
+        )  # True = Future position, hide it
 
     def forward(self, x):  # (B, T, 768)
         B, T, C = x.shape
@@ -156,3 +156,37 @@ class GPT2Model(nn.Module):
             x = block(x)
         x = self.ln_f(x)
         return self.lm_head(x)
+
+
+_CONV1D_WEIGHTS = (
+    "attn.c_attn.weight",
+    "attn.c_proj.weight",
+    "mlp.c_fc.weight",
+    "mlp.c_proj.weight",
+)
+_SKIP = (".attn.bias", ".attn.masked_bias")  # saved causal masks, not learned weights
+
+
+def load_hf_weights(model, hf):
+    """Copy Hugging Face GPT-2 weights (name -> tensor) into our model, in place."""
+    sd = model.state_dict()
+    loaded = set()
+    with torch.no_grad():
+        for name, t in hf.items():
+            name = name.removeprefix("transformer.")
+            if name.endswith(_SKIP) or name == "lm_head.weight":
+                continue
+            if name.endswith(_CONV1D_WEIGHTS):
+                t = t.t()
+            if name not in sd:
+                raise KeyError(f"unexpected weight in checkpoint: {name}")
+            if sd[name].shape != t.shape:
+                raise ValueError(
+                    f"{name}: checkpoint {tuple(t.shape)} vs model {tuple(sd[name].shape)}"
+                )
+            sd[name].copy_(t)
+            loaded.add(name)
+
+    missing = set(sd) - loaded - {"lm_head.weight"}
+    if missing:
+        raise ValueError(f"weights missing from checkpoint: {sorted(missing)}")
