@@ -2,9 +2,10 @@
 
 import math
 from dataclasses import dataclass
-
 import torch
 from torch import nn
+
+from nanoinfer.weights import load_hf_checkpoint
 
 
 @dataclass
@@ -156,6 +157,12 @@ class GPT2Model(nn.Module):
             x = block(x)
         x = self.ln_f(x)
         return self.lm_head(x)
+    @classmethod
+    def from_pretrained(cls, repo_id="openai-community/gpt2"):
+        """Build GPT-2 small and load OpenAI's trained weights from the Hub."""
+        model = cls(GPT2Config())
+        load_hf_weights(model, load_hf_checkpoint(repo_id))
+        return model.eval()
 
 
 _CONV1D_WEIGHTS = (
