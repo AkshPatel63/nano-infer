@@ -157,6 +157,7 @@ class GPT2Model(nn.Module):
             x = block(x)
         x = self.ln_f(x)
         return self.lm_head(x)
+
     @classmethod
     def from_pretrained(cls, repo_id="openai-community/gpt2"):
         """Build GPT-2 small and load OpenAI's trained weights from the Hub."""
