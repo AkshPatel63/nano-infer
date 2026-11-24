@@ -41,13 +41,15 @@ uv run pytest -m slow    # full comparisons against Hugging Face's GPT-2
 
 ## Roadmap
 
-- ✅ **GPT-2 from scratch, verified against Hugging Face**
+## Roadmap
+
+- ✅ **GPT-2 from scratch, verified against Hugging Face** (v0.1.0)
   - ✅ Model, weight loading, logits match
   - ✅ Greedy generation matching Hugging Face, sampling (temperature, top-k, top-p), seeds
   - ✅ CLI and automatic device selection
+- ⬜ Benchmarks + KV cache on GPT-2 (time to first token, per-token latency, tokens/sec, memory)
 - ⬜ Qwen3 0.6B support (RoPE, RMSNorm, grouped-query attention, SwiGLU, chat template)
-- ⬜ Benchmarks + correctness harness (time to first token, latency percentiles, tokens/sec, % of hardware roofline; KL divergence and top-1 agreement across fp32/bf16/fp16)
-- ⬜ KV cache, bf16, `torch.compile`
+- ⬜ Single-request speed: bf16, `torch.compile`, correctness harness (KL divergence, top-1 agreement), GPU benchmarks
 - ⬜ Continuous batching
 - ⬜ Paged KV cache + prefix caching
 - ⬜ OpenAI-compatible server
