@@ -1,6 +1,6 @@
 [project]
 name = "nano-infer"
-version = "0.0.1"
+version = "0.1.0"
 description = "An LLM inference engine built from scratch in PyTorch, focused on speed and correctness."
 readme = "README.md"
 license = "MIT"
