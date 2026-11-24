@@ -40,3 +40,6 @@ explicit = true
 testpaths = ["tests"]
 addopts = "-q"
 markers = ["slow: downloads model weights; run with -m slow"]
+
+[project.scripts]
+nano-infer = "nanoinfer.cli:main"
