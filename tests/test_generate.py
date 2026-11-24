@@ -39,3 +39,10 @@ def test_handles_prompt_longer_than_context(tiny_model):
     idx = torch.randint(0, 100, (1, 40))             # 40 tokens > context of 32
     out = generate(tiny_model, idx, max_new_tokens=3)
     assert out.shape == (1, 43)                      # cropping kept it running
+
+
+def test_sampling_with_seed_is_reproducible(tiny_model):
+    idx = torch.tensor([[1, 2, 3]])
+    a = generate(tiny_model, idx, max_new_tokens=10, temperature=1.0, top_p=0.9, seed=42)
+    b = generate(tiny_model, idx, max_new_tokens=10, temperature=1.0, top_p=0.9, seed=42)
+    assert torch.equal(a, b)
