@@ -1,11 +1,11 @@
 # nano-infer
 
-[![tests](https://github.com/AkshPatel63/nano-infer/actions/workflows/tests.yml/badge.svg)](https://github.com/AkshPatel63/nano-infer/actions/workflows/tests.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+![tests](https://github.com/AkshPatel63/nano-infer/actions/workflows/tests.yml/badge.svg)
+![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 
 An LLM inference engine built from scratch in PyTorch, focused on **speed and correctness**: every step is verified against Hugging Face `transformers`.
 
-**Status:** GPT-2 (124M) runs end to end, matching Hugging Face. Next: Qwen3 0.6B, then making it fast.
+**Status: GPT-2 (124M) runs end to end, matching Hugging Face. Next: benchmarks and a KV cache, then Qwen3 0.6B.**
 
 ## Results
 
@@ -57,7 +57,7 @@ uv run pytest -m slow    # full comparisons against Hugging Face's GPT-2
 
 ## Acknowledgements
 
-Started from Sebastian Raschka's [*Build a Large Language Model (From Scratch)*](https://github.com/rasbt/LLMs-from-scratch). Also inspired by Andrej Karpathy's [nanoGPT](https://github.com/karpathy/nanoGPT).
+Started from Sebastian Raschka's *[Build a Large Language Model (From Scratch)](https://github.com/rasbt/LLMs-from-scratch)*. Also inspired by Andrej Karpathy's [nanoGPT](https://github.com/karpathy/nanoGPT).
 
 ## License
 
